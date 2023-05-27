@@ -1,0 +1,4 @@
+connexion
+Flask==2.3.2
+jsonify
+rich
