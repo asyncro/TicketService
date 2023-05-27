@@ -1,8 +1,7 @@
+import json
 import unittest
 
 import connexion
-from flask import Flask
-from flask.testing import FlaskClient
 
 app = connexion.FlaskApp(__name__)
 app.debug = True
@@ -18,7 +17,10 @@ class ReservationTestCase(unittest.TestCase):
         # Test with a valid event ID and available tickets
         response = self.client.post("/events/1/reservations", json={"tickets": 2})
         self.assertEqual(200, response.status_code)
-        self.assertEqual("\"Success\"", response.data.decode().strip())
+        response_obj = json.loads(response.data.decode())
+        self.assertEqual(1, response_obj['event_id'])
+        self.assertIsNotNone(response_obj['id'])
+        self.assertEqual(2, response_obj['number_tickets'])
 
     def test_create_reservation_invalid_event_id(self):
         # Test with an invalid event ID

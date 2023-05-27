@@ -1,6 +1,8 @@
+import datetime
+
 from flask import jsonify, abort
 
-from model.Event import Event
+from model.Event import Event, Reservation
 
 EVENTS = {
     1: Event(
@@ -50,7 +52,10 @@ EVENTS = {
 
 
 def get_all_events():
-    return jsonify([e.to_dict() for e in EVENTS.values()])
+    return [e.to_dict() for e in EVENTS.values()]
+
+
+reservations = {}
 
 
 def create_reservation(event_id: int, body):
@@ -70,6 +75,7 @@ def create_reservation(event_id: int, body):
 
     event.tickets_available -= tickets
 
-    # TODO: Return reservation ID
+    reservation = Reservation(event_id=e_id, number_tickets=tickets)
+    reservations[reservation.id] = reservation
 
-    return "Success"
+    return reservation.to_dict()
