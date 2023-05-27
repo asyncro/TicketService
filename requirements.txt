@@ -1,4 +1,4 @@
-connexion
-Flask==2.3.2
+connexion[swagger-ui]
+Flask==2.2.3
 jsonify
 rich

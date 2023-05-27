@@ -16,40 +16,45 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Event'
-#  /events/{eventId}/reservations:
-#    post:
-#      summary: Make a reservation for an event
-#      operationId: create_reservation
-#      parameters:
-#        - in: path
-#          name: eventId
-#          required: true
-#          schema:
-#            type: string
-#        - in: query
-#          name: tickets
-#          required: true
-#          schema:
-#            type: integer
-#            minimum: 1
-#      responses:
-#        '200':
-#          description: OK
-#        '400':
-#          description: Bad Request
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/components/schemas/Error'
-#        '404':
-#          description: Not Found
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/components/schemas/Error'
+  /events/{event_id}/reservations:
+    post:
+      summary: Make a reservation for an event
+      operationId: events.create_reservation
+      parameters:
+        - in: path
+          name: event_id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tickets:
+                  type: integer
+                  minimum: 1
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+#  /events/{eventId}/reservations/{reservationId}:
 #    patch:
 #      summary: Modify an existing reservation
-#      operationId: modify_reservation
+#      operationId: events.modify_reservation
 #      parameters:
 #        - in: path
 #          name: eventId
@@ -77,10 +82,9 @@ paths:
 #            application/json:
 #              schema:
 #                $ref: '#/components/schemas/Error'
-#  /events/{eventId}/reservations/{reservationId}:
 #    delete:
 #      summary: Cancel a reservation
-#      operationId: cancel_reservation
+#      operationId: events.cancel_reservation
 #      parameters:
 #        - in: path
 #          name: eventId

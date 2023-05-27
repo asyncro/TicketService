@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import jsonify, abort
 
 from model.Event import Event
 
@@ -51,3 +51,25 @@ EVENTS = {
 
 def get_all_events():
     return jsonify([e.to_dict() for e in EVENTS.values()])
+
+
+def create_reservation(event_id: int, body):
+    e_id = int(event_id)
+
+    if e_id not in EVENTS:
+        abort(400, f"{e_id} is not a valid event ID. Valid ids are: {EVENTS.keys()}")
+
+    if "tickets" not in body:
+        abort(400, f"number of tickets to reserve not specified")
+
+    event = EVENTS[e_id]
+    tickets = body["tickets"]
+
+    if tickets > event.tickets_available:
+        abort(400, f"Event {e_id} does not have {tickets} ticket(s) available")
+
+    event.tickets_available -= tickets
+
+    # TODO: Return reservation ID
+
+    return "Success"
