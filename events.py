@@ -47,6 +47,13 @@ EVENTS = {
                     "himself* And that is not how I'm introducing myself.",
         date_str='2047-10-21T09:00:00Z',
         tickets_available=0
+    ),
+    6: Event(
+        _id=6,
+        name='Spaceship to Moon',
+        description="Another test",
+        date_str='2047-10-21T09:00:00Z',
+        tickets_available=50
     )
 }
 
@@ -79,13 +86,17 @@ def create_reservation(event_id: str, body: dict):
 
 
 def modify_reservation(event_id: str, reservation_id: str, body: dict):
-    if reservation_id not in reservations:
+    r_id = int(reservation_id)
+
+    if r_id not in reservations:
         abort(404, f"{reservation_id} is not a valid reservation ID")
 
-    r_id = int(reservation_id)
+    reservation = reservations[r_id]
+    if reservation.cancelled:
+        abort(400, f"{reservation_id} has been cancelled")
+
     event, tickets = process_reservation_params(event_id, body)
 
-    reservation = reservations[r_id]
     # only allow returning up to number_tickets - 1, so there is at least 1 ticket left on the reservation
     if tickets <= - reservation.number_tickets:
         abort(400, f"Cannot return {tickets} on this reservation. Try cancelling instead.")
@@ -94,6 +105,29 @@ def modify_reservation(event_id: str, reservation_id: str, body: dict):
     event.tickets_available -= tickets
 
     return reservation.to_dict()
+
+
+def cancel_reservation(event_id: str, reservation_id: str):
+    r_id = int(reservation_id)
+
+    if r_id not in reservations:
+        abort(404, f"{reservation_id} is not a valid reservation ID")
+    reservation = reservations[r_id]
+
+    if reservation.cancelled:
+        abort(400, f"Reservation {reservation_id} has already been cancelled")
+
+    e_id = int(event_id)
+    if e_id not in EVENTS:
+        abort(400, f"{e_id} is not a valid event ID. Valid ids are: {EVENTS.keys()}")
+
+    event = EVENTS[e_id]
+
+    event.tickets_available += reservation.number_tickets
+    reservation.number_tickets = 0
+    reservation.cancelled = True
+
+    return "Success"
 
 
 def process_reservation_params(event_id: str, body: dict):

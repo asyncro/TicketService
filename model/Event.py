@@ -31,6 +31,7 @@ class Reservation:
         self.number_tickets = number_tickets
         self.date_created = datetime.now() if date_created is None else date_created
         self.date_modified = date_modified
+        self.cancelled = False
 
     def to_dict(self) -> dict:
         return {

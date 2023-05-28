@@ -101,29 +101,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-#    delete:
-#      summary: Cancel a reservation
-#      operationId: events.cancel_reservation
-#      parameters:
-#        - in: path
-#          name: event_id
-#          required: true
-#          schema:
-#            type: integer
-#        - in: path
-#          name: reservation_id
-#          required: true
-#          schema:
-#            type: integer
-#      responses:
-#        '200':
-#          description: OK
-#        '404':
-#          description: Not Found
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Cancel a reservation
+      operationId: events.cancel_reservation
+      parameters:
+        - in: path
+          name: event_id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: reservation_id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     Event:
