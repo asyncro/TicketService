@@ -20,6 +20,12 @@ paths:
     get:
       summary: Get details for single event
       operationId: events.get_event
+      parameters:
+        - in: path
+          name: event_id
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -27,6 +33,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Event'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /events/{event_id}/reservations:
     post:
       summary: Make a reservation for an event
@@ -118,6 +130,12 @@ paths:
       responses:
         '200':
           description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
         '404':
           description: Not Found
           content:

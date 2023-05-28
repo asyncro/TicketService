@@ -1,6 +1,4 @@
-import datetime
-
-from flask import jsonify, abort
+from flask import abort
 
 from model.Event import Event, Reservation
 
