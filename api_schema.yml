@@ -51,51 +51,59 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-#  /events/{eventId}/reservations/{reservationId}:
-#    patch:
-#      summary: Modify an existing reservation
-#      operationId: events.modify_reservation
-#      parameters:
-#        - in: path
-#          name: eventId
-#          required: true
-#          schema:
-#            type: string
-#        - in: query
-#          name: tickets
-#          required: true
-#          schema:
-#            type: integer
-#            minimum: 1
-#      responses:
-#        '200':
-#          description: OK
-#        '400':
-#          description: Bad Request
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/components/schemas/Error'
-#        '404':
-#          description: Not Found
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/components/schemas/Error'
+  /events/{event_id}/reservations/{reservation_id}:
+    patch:
+      summary: Modify an existing reservation
+      operationId: events.modify_reservation
+      parameters:
+        - in: path
+          name: event_id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: reservation_id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tickets:
+                  type: integer
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 #    delete:
 #      summary: Cancel a reservation
 #      operationId: events.cancel_reservation
 #      parameters:
 #        - in: path
-#          name: eventId
+#          name: event_id
 #          required: true
 #          schema:
-#            type: string
+#            type: integer
 #        - in: path
-#          name: reservationId
+#          name: reservation_id
 #          required: true
 #          schema:
-#            type: string
+#            type: integer
 #      responses:
 #        '200':
 #          description: OK

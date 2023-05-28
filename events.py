@@ -58,12 +58,39 @@ def get_all_events():
 reservations = {}
 
 
-def create_reservation(event_id: int, body):
+def create_reservation(event_id: str, body: dict):
+    event, tickets = process_reservation_params(event_id, body)
+    event.tickets_available -= tickets
+
+    reservation = Reservation(event_id=event.id, number_tickets=tickets)
+    reservations[reservation.id] = reservation
+
+    return reservation.to_dict()
+
+
+def modify_reservation(event_id: str, reservation_id: str, body: dict):
+    if reservation_id not in reservations:
+        abort(400, f"{reservation_id} is not a valid reservation ID")
+
+    r_id = int(reservation_id)
+    event, tickets = process_reservation_params(event_id, body)
+
+    reservation = reservations[r_id]
+    # only allow returning up to number_tickets - 1, so there is at least 1 ticket left on the reservation
+    if tickets <= - reservation.number_tickets:
+        abort(400, f"Cannot return {tickets} on this reservation. Try cancelling instead.")
+
+    reservation.number_tickets += tickets
+    event.tickets_available -= tickets
+
+    return reservation.to_dict()
+
+
+def process_reservation_params(event_id: str, body: dict):
     e_id = int(event_id)
 
     if e_id not in EVENTS:
         abort(400, f"{e_id} is not a valid event ID. Valid ids are: {EVENTS.keys()}")
-
     if "tickets" not in body:
         abort(400, f"number of tickets to reserve not specified")
 
@@ -73,9 +100,4 @@ def create_reservation(event_id: int, body):
     if tickets > event.tickets_available:
         abort(400, f"Event {e_id} does not have {tickets} ticket(s) available")
 
-    event.tickets_available -= tickets
-
-    reservation = Reservation(event_id=e_id, number_tickets=tickets)
-    reservations[reservation.id] = reservation
-
-    return reservation.to_dict()
+    return event, tickets
