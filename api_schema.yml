@@ -16,6 +16,17 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Event'
+  /events/{event_id}:
+    get:
+      summary: Get details for single event
+      operationId: events.get_event
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
   /events/{event_id}/reservations:
     post:
       summary: Make a reservation for an event

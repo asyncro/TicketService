@@ -55,6 +55,16 @@ def get_all_events():
     return [e.to_dict() for e in EVENTS.values()]
 
 
+def get_event(event_id: str):
+    e_id = int(event_id)
+
+    if e_id not in EVENTS:
+        abort(404, f"{e_id} is not a valid event ID. Valid ids are: {EVENTS.keys()}")
+
+    event = EVENTS[e_id]
+    return event.to_dict()
+
+
 reservations = {}
 
 
@@ -70,7 +80,7 @@ def create_reservation(event_id: str, body: dict):
 
 def modify_reservation(event_id: str, reservation_id: str, body: dict):
     if reservation_id not in reservations:
-        abort(400, f"{reservation_id} is not a valid reservation ID")
+        abort(404, f"{reservation_id} is not a valid reservation ID")
 
     r_id = int(reservation_id)
     event, tickets = process_reservation_params(event_id, body)

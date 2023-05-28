@@ -61,40 +61,68 @@ class ReservationTestCase(unittest.TestCase):
         self.assert_400_status_code(response)
         self.assertIn("number of tickets to reserve not specified", response.data.decode())
 
+    def test_invalid_event_id(self):
+        event_response = self.client.get(f"/events/999")
+        self.assert_404_status_code(event_response)
+
+    def test_modify_reservation_bad_reservation_id(self):
+        # Create reservation for 50 tickets for
+        reservation_id = self.create_reservation(event_id=4, number_tickets=1)
+        response = self.client.patch(f"/events/4/reservations/{reservation_id*999}", json={"tickets": 1})
+        self.assert_404_status_code(response)
+
     def test_modify_reservation(self):
         # Create reservation for 50 tickets for
         reservation_id = self.create_reservation(event_id=4, number_tickets=50)
+        self.assert_number_tickets_remaining(event_id=4, number_tickets=150)
 
         response = self.client.patch(f"/events/4/reservations/{reservation_id}", json={"tickets": 1})
         self.assert_200_status_code(response)
         self.assert_reservation(response, event_id=4, number_tickets=51)
+        self.assert_number_tickets_remaining(event_id=4, number_tickets=149)
 
         response = self.client.patch(f"/events/4/reservations/{reservation_id}", json={"tickets": 149})
         self.assert_200_status_code(response)
         self.assert_reservation(response, event_id=4, number_tickets=200)
+        self.assert_number_tickets_remaining(event_id=4, number_tickets=0)
 
         response = self.client.patch(f"/events/4/reservations/{reservation_id}", json={"tickets": 1})
         self.assert_400_status_code(response)
         self.assertIn("does not have", response.data.decode())
+        self.assert_number_tickets_remaining(event_id=4, number_tickets=0)
 
         response = self.client.patch(f"/events/4/reservations/{reservation_id}", json={"tickets": -149})
         self.assert_200_status_code(response)
         self.assert_reservation(response, event_id=4, number_tickets=51)
+        self.assert_number_tickets_remaining(event_id=4, number_tickets=149)
 
         response = self.client.patch(f"/events/4/reservations/{reservation_id}", json={"tickets": -2})
         self.assert_200_status_code(response)
         self.assert_reservation(response, event_id=4, number_tickets=49)
+        self.assert_number_tickets_remaining(event_id=4, number_tickets=151)
 
         response = self.client.patch(f"/events/4/reservations/{reservation_id}", json={"tickets": -48})
         self.assert_200_status_code(response)
         self.assert_reservation(response, event_id=4, number_tickets=1)
+        self.assert_number_tickets_remaining(event_id=4, number_tickets=199)
 
         response = self.client.patch(f"/events/4/reservations/{reservation_id}", json={"tickets": -1})
         self.assert_400_status_code(response)
         self.assertIn("Cannot return", response.data.decode())
 
+        self.assert_number_tickets_remaining(event_id=4, number_tickets=199)
+
+    def assert_number_tickets_remaining(self, event_id, number_tickets):
+        event_response = self.client.get(f"/events/{event_id}")
+        self.assert_200_status_code(event_response)
+        event_response_obj = json.loads(event_response.data.decode())
+        self.assertEquals(number_tickets, event_response_obj['tickets_available'])
+
     def assert_200_status_code(self, response):
         self.assertEqual(200, response.status_code)
+
+    def assert_404_status_code(self, response):
+        self.assertEqual(404, response.status_code)
 
     def assert_400_status_code(self, response):
         self.assertEqual(400, response.status_code)
